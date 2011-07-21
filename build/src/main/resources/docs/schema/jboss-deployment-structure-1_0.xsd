@@ -75,15 +75,15 @@
                 <annotation xmlns="http://www.w3.org/2001/XMLSchema">
                     <documentation>
                         Element that corresponds to a deployment. This is used to customise
-                        class loading for a deployment or a sub deployment.
+                        the module classloader of the deployment.
                     </documentation>
                 </annotation>
             </xsd:element>
-            <xsd:element name="sub-deployment" type="deploymentType" minOccurs="0" maxOccurs="unbounded" >
+            <xsd:element name="sub-deployment" type="subDeploymentType" minOccurs="0" maxOccurs="unbounded" >
                 <annotation xmlns="http://www.w3.org/2001/XMLSchema">
                     <documentation>
-                        Element that corresponds to a deployment. This is used to customise
-                        class loading for a deployment or a sub deployment.
+                        Element that corresponds to a sub deployment. This is used to customise
+                        the module classloader of the sub deployment.
                     </documentation>
                 </annotation>
             </xsd:element>
