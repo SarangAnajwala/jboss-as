@@ -24,9 +24,14 @@ package org.jboss.as.ejb3.timer.schedule;
 import junit.framework.Assert;
 import org.jboss.as.ejb3.timerservice.schedule.util.CalendarUtil;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * Tests {@link CalendarUtil}
@@ -34,8 +39,38 @@ import java.util.GregorianCalendar;
  * @author Jaikiran Pai
  * @version $Revision: $
  */
+@RunWith(Parameterized.class)
 public class CalendarUtilTestCase {
 
+    /**
+     * The timezone which will be used during the tests
+     */
+    private TimeZone timezone;
+
+    /**
+     * Construct a testcase for the timezone
+     */
+    public CalendarUtilTestCase(TimeZone timezone) {
+        this.timezone = timezone;
+    }
+
+    /**
+     * This method returns a collection of all available timezones in the system.
+     * The tests in this {@link CalendarUtilTestCase} will then be run
+     * against each of these timezones
+     */
+    @Parameterized.Parameters
+    public static Collection<Object[]> getTimezones() {
+        String[] allTimezoneIDs = TimeZone.getAvailableIDs();
+        Object[][] timezones = new Object[allTimezoneIDs.length][];
+        int i = 0;
+        for (String timezoneID : allTimezoneIDs) {
+            timezones[i++] = new Object[]
+                    {TimeZone.getTimeZone(timezoneID)};
+        }
+
+        return Arrays.asList(timezones);
+    }
     /**
      * Tests that the {@link CalendarUtil#getLastDateOfMonth(java.util.Calendar)} returns the correct
      * date for various months.
@@ -43,7 +78,7 @@ public class CalendarUtilTestCase {
     @Test
     public void testLastDateOfMonth() {
         // check last date of march
-        Calendar march = new GregorianCalendar();
+        Calendar march = this.getTimezoneSpecificCalendar();
         march.set(Calendar.MONTH, Calendar.MARCH);
         march.set(Calendar.DAY_OF_MONTH, 1);
 
@@ -51,7 +86,7 @@ public class CalendarUtilTestCase {
         Assert.assertEquals("Unexpected last date for march", 31, lastDateOfMarch);
 
         // check for april
-        Calendar april = new GregorianCalendar();
+        Calendar april = this.getTimezoneSpecificCalendar();
         april.set(Calendar.MONTH, Calendar.APRIL);
         april.set(Calendar.DAY_OF_MONTH, 1);
 
@@ -59,7 +94,7 @@ public class CalendarUtilTestCase {
         Assert.assertEquals("Unexpected last date for april", 30, lastDateOfApril);
 
         // check of february (non-leap year)
-        Calendar nonLeapFebruary = new GregorianCalendar();
+        Calendar nonLeapFebruary = this.getTimezoneSpecificCalendar();
         nonLeapFebruary.set(Calendar.MONTH, Calendar.FEBRUARY);
         nonLeapFebruary.set(Calendar.YEAR, 2010);
         nonLeapFebruary.set(Calendar.DAY_OF_MONTH, 1);
@@ -68,7 +103,7 @@ public class CalendarUtilTestCase {
         Assert.assertEquals("Unexpected last date for non-leap february", 28, lastDateOfNonLeapFebruary);
 
         // check for february (leap year)
-        Calendar leapFebruary = new GregorianCalendar();
+        Calendar leapFebruary = this.getTimezoneSpecificCalendar();
         leapFebruary.set(Calendar.MONTH, Calendar.FEBRUARY);
         leapFebruary.set(Calendar.YEAR, 2012);
         leapFebruary.set(Calendar.DAY_OF_MONTH, 1);
@@ -84,7 +119,7 @@ public class CalendarUtilTestCase {
 
         // 1st Sun of July 2010 (hardcoded, after checking with the system calendar)
         int expectedDateOfFirstSunOfJuly2010 = 4;
-        Calendar july2010 = new GregorianCalendar();
+        Calendar july2010 = this.getTimezoneSpecificCalendar();
         july2010.set(Calendar.DAY_OF_MONTH, 1);
         july2010.set(Calendar.MONTH, Calendar.JULY);
         july2010.set(Calendar.YEAR, 2010);
@@ -95,7 +130,7 @@ public class CalendarUtilTestCase {
 
         // 1st Mon of June 2009
         int expectedDateOfFirstMonOfJune2009 = 1;
-        Calendar june2009 = new GregorianCalendar();
+        Calendar june2009 = this.getTimezoneSpecificCalendar();
         june2009.set(Calendar.DAY_OF_MONTH, 1);
         june2009.set(Calendar.MONTH, Calendar.JUNE);
         june2009.set(Calendar.YEAR, 2009);
@@ -106,7 +141,7 @@ public class CalendarUtilTestCase {
 
         // 1st Tue of Feb 2012
         int expectedDateOfFirstTueOfFeb2012 = 7;
-        Calendar feb2012 = new GregorianCalendar();
+        Calendar feb2012 = this.getTimezoneSpecificCalendar();
         feb2012.set(Calendar.DAY_OF_MONTH, 1);
         feb2012.set(Calendar.MONTH, Calendar.FEBRUARY);
         feb2012.set(Calendar.YEAR, 2012);
@@ -117,7 +152,7 @@ public class CalendarUtilTestCase {
 
         // 1st Wed of Jan 2006
         int expectedDateOfFirstMonOfJan2006 = 4;
-        Calendar jan2006 = new GregorianCalendar();
+        Calendar jan2006 = this.getTimezoneSpecificCalendar();
         jan2006.set(Calendar.DAY_OF_MONTH, 1);
         jan2006.set(Calendar.MONTH, Calendar.JANUARY);
         jan2006.set(Calendar.YEAR, 2006);
@@ -128,7 +163,7 @@ public class CalendarUtilTestCase {
 
         // 1st Thu of June 1999
         int expectedDateOfFirstThuOfSep1999 = 2;
-        Calendar sep1999 = new GregorianCalendar();
+        Calendar sep1999 = this.getTimezoneSpecificCalendar();
         sep1999.set(Calendar.DAY_OF_MONTH, 1);
         sep1999.set(Calendar.MONTH, Calendar.SEPTEMBER);
         sep1999.set(Calendar.YEAR, 1999);
@@ -139,7 +174,7 @@ public class CalendarUtilTestCase {
 
         // 1st Fri of Dec 2058
         int expectedDateOfFirstFriOfDec2058 = 6;
-        Calendar dec2058 = new GregorianCalendar();
+        Calendar dec2058 = this.getTimezoneSpecificCalendar();
         dec2058.set(Calendar.DAY_OF_MONTH, 1);
         dec2058.set(Calendar.MONTH, Calendar.DECEMBER);
         dec2058.set(Calendar.YEAR, 2058);
@@ -150,7 +185,7 @@ public class CalendarUtilTestCase {
 
         // 1st Sat of Aug 2000
         int expectedDateOfFirstSatOfAug2000 = 5;
-        Calendar aug2000 = new GregorianCalendar();
+        Calendar aug2000 = this.getTimezoneSpecificCalendar();
         aug2000.set(Calendar.DAY_OF_MONTH, 1);
         aug2000.set(Calendar.MONTH, Calendar.AUGUST);
         aug2000.set(Calendar.YEAR, 2000);
@@ -167,7 +202,7 @@ public class CalendarUtilTestCase {
 
         // 2nd Sun of May 2010 (hardcoded, after checking with the system calendar)
         int expectedDateOfSecondSunOfMay2010 = 9;
-        Calendar may2010 = new GregorianCalendar();
+        Calendar may2010 = this.getTimezoneSpecificCalendar();
         may2010.set(Calendar.MONTH, Calendar.MAY);
         may2010.set(Calendar.YEAR, 2010);
 
@@ -177,7 +212,7 @@ public class CalendarUtilTestCase {
 
         // 2nd Mon of Feb 2111
         int expectedDateOfSecondMonOfFeb2111 = 9;
-        Calendar feb2111 = new GregorianCalendar();
+        Calendar feb2111 = this.getTimezoneSpecificCalendar();
         feb2111.set(Calendar.MONTH, Calendar.FEBRUARY);
         feb2111.set(Calendar.YEAR, 2111);
 
@@ -187,7 +222,7 @@ public class CalendarUtilTestCase {
 
         // 2nd Tue of Oct 2016
         int expectedDateOfSecondTueOct2016 = 11;
-        Calendar oct2016 = new GregorianCalendar();
+        Calendar oct2016 = this.getTimezoneSpecificCalendar();
         oct2016.set(Calendar.MONTH, Calendar.OCTOBER);
         oct2016.set(Calendar.YEAR, 2016);
 
@@ -197,7 +232,7 @@ public class CalendarUtilTestCase {
 
         // 2nd Wed of Apr 2010
         int expectedDateOfSecWedApr2010 = 14;
-        Calendar apr2010 = new GregorianCalendar();
+        Calendar apr2010 = this.getTimezoneSpecificCalendar();
         apr2010.set(Calendar.DAY_OF_MONTH, 1);
         apr2010.set(Calendar.MONTH, Calendar.APRIL);
         apr2010.set(Calendar.YEAR, 2010);
@@ -208,7 +243,7 @@ public class CalendarUtilTestCase {
 
         // 2nd Thu of Mar 2067
         int expectedDateOfSecondThuMar2067 = 10;
-        Calendar march2067 = new GregorianCalendar();
+        Calendar march2067 = this.getTimezoneSpecificCalendar();
         march2067.set(Calendar.DAY_OF_MONTH, 1);
         march2067.set(Calendar.MONTH, Calendar.MARCH);
         march2067.set(Calendar.YEAR, 2067);
@@ -219,7 +254,7 @@ public class CalendarUtilTestCase {
 
         // 2nd Fri of Nov 2020
         int expectedDateOfSecFriNov2020 = 13;
-        Calendar nov2020 = new GregorianCalendar();
+        Calendar nov2020 = this.getTimezoneSpecificCalendar();
         nov2020.set(Calendar.DAY_OF_MONTH, 1);
         nov2020.set(Calendar.MONTH, Calendar.NOVEMBER);
         nov2020.set(Calendar.YEAR, 2020);
@@ -230,7 +265,7 @@ public class CalendarUtilTestCase {
 
         // 2nd Sat of Sep 2013
         int expectedDateOfSecSatOfSep2013 = 14;
-        Calendar aug2000 = new GregorianCalendar();
+        Calendar aug2000 = this.getTimezoneSpecificCalendar();
         aug2000.set(Calendar.DAY_OF_MONTH, 1);
         aug2000.set(Calendar.MONTH, Calendar.SEPTEMBER);
         aug2000.set(Calendar.YEAR, 2013);
@@ -245,7 +280,7 @@ public class CalendarUtilTestCase {
     public void test3rdXXXDay() {
         // 1st Sun of July 2010 (hardcoded, after checking with the system calendar)
         int expectedDateOfFirstSunOfJuly2010 = 4;
-        Calendar july2010 = new GregorianCalendar();
+        Calendar july2010 = this.getTimezoneSpecificCalendar();
         july2010.set(Calendar.MONTH, Calendar.JULY);
         july2010.set(Calendar.YEAR, 2010);
 
@@ -259,7 +294,7 @@ public class CalendarUtilTestCase {
     public void test4thXXXDay() {
         // 1st Sun of July 2010 (hardcoded, after checking with the system calendar)
         int expectedDateOfFirstSunOfJuly2010 = 4;
-        Calendar july2010 = new GregorianCalendar();
+        Calendar july2010 = this.getTimezoneSpecificCalendar();
         july2010.set(Calendar.MONTH, Calendar.JULY);
         july2010.set(Calendar.YEAR, 2010);
 
@@ -273,7 +308,7 @@ public class CalendarUtilTestCase {
     public void test5thXXXDay() {
         // 1st Sun of July 2010 (hardcoded, after checking with the system calendar)
         int expectedDateOfFirstSunOfJuly2010 = 4;
-        Calendar july2010 = new GregorianCalendar();
+        Calendar july2010 = this.getTimezoneSpecificCalendar();
         july2010.set(Calendar.MONTH, Calendar.JULY);
         july2010.set(Calendar.YEAR, 2010);
 
@@ -287,7 +322,7 @@ public class CalendarUtilTestCase {
     public void test1stSunday() {
         // 1st Sun of July 2010 (hardcoded, after checking with the system calendar)
         int expectedDateOfFirstSunOfJuly2010 = 4;
-        Calendar july2010 = new GregorianCalendar();
+        Calendar july2010 = this.getTimezoneSpecificCalendar();
         july2010.set(Calendar.MONTH, Calendar.JULY);
         july2010.set(Calendar.YEAR, 2010);
 
@@ -297,4 +332,9 @@ public class CalendarUtilTestCase {
 
     }
 
+    private Calendar getTimezoneSpecificCalendar() {
+        final Calendar cal = new GregorianCalendar();
+        cal.setTimeZone(this.timezone);
+        return  cal;
+    }
 }

@@ -48,7 +48,6 @@ import java.util.TimeZone;
  * @author Jaikiran Pai
  * @version $Revision: $
  */
-@Ignore
 @RunWith(Parameterized.class)
 public class CalendarBasedTimeoutTestCase {
 
