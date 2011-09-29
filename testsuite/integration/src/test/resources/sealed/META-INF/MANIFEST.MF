@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Sealed: true
+
+Name: org/jboss/as/testsuite/integration/classloader/sealed/packagetwo
+Sealed: false
+
+
+Name: org/jboss/as/testsuite/integration/classloader/sealed/packageone
+Sealed: true
+
