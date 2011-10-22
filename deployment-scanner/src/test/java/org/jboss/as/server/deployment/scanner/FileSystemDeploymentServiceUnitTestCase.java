@@ -135,7 +135,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -152,7 +152,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File dodeploy = createFile(nestedDir, "foo.war" + FileSystemDeploymentService.DO_DEPLOY);
         File deployed = new File(nestedDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -171,7 +171,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed2 = new File(tmpDir, "bar.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(2);
+        ts.controller.addSuccessResponse(2);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -191,7 +191,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File failed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.FAILED_DEPLOY);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeFailureResponse(1, 1);
+        ts.controller.addFailureResponse(1, 1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -213,7 +213,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File failed2 = new File(tmpDir, "bar.war" + FileSystemDeploymentService.FAILED_DEPLOY);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeFailureResponse(2, 2);
+        ts.controller.addFailureResponse(2, 2);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -239,9 +239,9 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File failed2 = new File(tmpDir, "foo.war" + FileSystemDeploymentService.FAILED_DEPLOY);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeFailureResponse(2, 1);
+        ts.controller.addFailureResponse(2, 1);
         // Retry fails as well
-        ts.controller.addCompositeFailureResponse(1, 1);
+        ts.controller.addFailureResponse(1, 1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -267,9 +267,9 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File failed2 = new File(tmpDir, "foo.war" + FileSystemDeploymentService.FAILED_DEPLOY);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeFailureResponse(2, 1);
+        ts.controller.addFailureResponse(2, 1);
         // Retry succeeds
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -347,7 +347,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee("foo.war");
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -363,7 +363,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee("foo.war");
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -378,7 +378,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         dodeploy = createFile("foo.war" + FileSystemDeploymentService.DO_DEPLOY);
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -412,7 +412,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed2 = new File(tmpDir, "bar.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(2);
+        ts.controller.addSuccessResponse(2);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -426,7 +426,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         dodeploy1 = createFile("foo.war" + FileSystemDeploymentService.DO_DEPLOY);
         dodeploy2 = createFile("bar.war" + FileSystemDeploymentService.DO_DEPLOY);
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(2);
+        ts.controller.addSuccessResponse(2);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(4, ts.repo.content.size());
@@ -446,7 +446,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File failed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.FAILED_DEPLOY);
         TesteeSet ts = createTestee("foo.war");
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -457,7 +457,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         dodeploy = createFile("foo.war" + FileSystemDeploymentService.DO_DEPLOY);
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeFailureResponse(1, 1);
+        ts.controller.addFailureResponse(1, 1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -479,7 +479,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File failed2 = new File(tmpDir, "foo.war" + FileSystemDeploymentService.FAILED_DEPLOY);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(2);
+        ts.controller.addSuccessResponse(2);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -493,9 +493,9 @@ public class FileSystemDeploymentServiceUnitTestCase {
         dodeploy1 = createFile("foo.war" + FileSystemDeploymentService.DO_DEPLOY);
         dodeploy2 = createFile("bar.war" + FileSystemDeploymentService.DO_DEPLOY);
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeFailureResponse(2, 1);
+        ts.controller.addFailureResponse(2, 1);
         // Retry fails as well
-        ts.controller.addCompositeFailureResponse(1, 1);
+        ts.controller.addFailureResponse(1, 1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(4, ts.repo.content.size());
@@ -517,7 +517,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File failed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.FAILED_DEPLOY);
         TesteeSet ts = createTestee();
         ts.testee.setAutoDeployZippedContent(true);
-        ts.controller.addCompositeFailureResponse(1, 1);
+        ts.controller.addFailureResponse(1, 1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -528,7 +528,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         failed.setLastModified(0);
 
         testSupport.createZip(war, 0, false, false, true, false);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -549,7 +549,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File failed2 = new File(tmpDir, "foo.war" + FileSystemDeploymentService.FAILED_DEPLOY);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(2);
+        ts.controller.addSuccessResponse(2);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -563,9 +563,9 @@ public class FileSystemDeploymentServiceUnitTestCase {
         dodeploy1 = createFile("foo.war" + FileSystemDeploymentService.DO_DEPLOY);
         dodeploy2 = createFile("bar.war" + FileSystemDeploymentService.DO_DEPLOY);
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeFailureResponse(2, 1);
+        ts.controller.addFailureResponse(2, 1);
         // Retry succeeds
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(4, ts.repo.content.size());
@@ -584,7 +584,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -596,7 +596,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         assertTrue(deployed.delete());
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -617,7 +617,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
         ts.testee.setAutoDeployZippedContent(true);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -626,7 +626,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         assertEquals(1, ts.controller.deployed.size());
 
         assertTrue(war.delete());
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertFalse(war.exists());
         assertFalse(dodeploy.exists());
@@ -641,7 +641,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         ts = createTestee();
         ts.testee.setAutoDeployZippedContent(false);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -669,7 +669,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
         ts.testee.setAutoDeployExplodedContent(true);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -678,7 +678,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         assertEquals(1, ts.controller.deployed.size());
 
         assertTrue(war.delete());
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertFalse(war.exists());
         assertFalse(dodeploy.exists());
@@ -694,7 +694,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         ts = createTestee();
         ts.testee.setAutoDeployExplodedContent(false);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -718,7 +718,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         ts = createTestee();
         ts.testee.setAutoDeployExplodedContent(true);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -727,7 +727,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         assertEquals(1, ts.controller.deployed.size());
 
         assertTrue(war.delete());
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertFalse(war.exists());
         assertFalse(dodeploy.exists());
@@ -743,7 +743,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -758,7 +758,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         dodeploy = createFile("foo.war" + FileSystemDeploymentService.DO_DEPLOY);
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -772,7 +772,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         assertTrue(deployed.delete());
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(2, ts.repo.content.size());
@@ -791,7 +791,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File undeployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.UNDEPLOYED);
         TesteeSet ts = createTestee();
         ts.testee.setAutoDeployZippedContent(true);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -801,7 +801,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         byte[] bytes = ts.controller.deployed.get("foo.war");
 
         assertTrue(deployed.delete());
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -815,7 +815,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         undeployed.setLastModified(0);
 
         testSupport.createZip(war, 0, false, false, false, false);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -834,7 +834,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee("foo.war");
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -844,7 +844,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         assertTrue(deployed.delete());
 //        ts.controller.addGetDeploymentNamesResponse();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         // Since AS7-431 the content is no longer managed
         //assertEquals(1, ts.repo.content.size());
@@ -906,7 +906,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         incomplete.delete();
         testSupport.createZip(incomplete, 0, false, false, false, false);
 
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         assertTrue(deployed.exists());
@@ -938,7 +938,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         incomplete.delete();
         testSupport.createZip(incomplete, 0, false, false, true, false);
 
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         assertTrue(deployed.exists());
@@ -974,7 +974,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         incomplete.delete();
         testSupport.createZip(incomplete, 0, false, false, false, false);
 
-        ts.controller.addCompositeSuccessResponse(2);
+        ts.controller.addSuccessResponse(2);
         ts.testee.scan();
 
         assertTrue(deployed.exists());
@@ -1040,7 +1040,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         TesteeSet ts = createTestee();
         ts.testee.setAutoDeployExplodedContent(true);
 
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         assertTrue(deployed.exists());
@@ -1069,7 +1069,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         skip.delete();
 
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         assertTrue(deployed.exists());
@@ -1136,21 +1136,21 @@ public class FileSystemDeploymentServiceUnitTestCase {
         TesteeSet ts = createTestee();
         ts.testee.setAutoDeployZippedContent(true);
 
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         assertTrue(deployed.exists());
 
         // Undeploy
         deployed.delete();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         assertTrue(undeployed.exists());
         assertFalse(deployed.exists());
 
         // Confirm it doesn't come back
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         assertTrue(undeployed.exists());
@@ -1188,7 +1188,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File dodeploy = createFile("foo.war" + FileSystemDeploymentService.DO_DEPLOY);
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -1196,7 +1196,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         // Create a new testee to simulate a reboot
         ts = createTestee();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -1209,7 +1209,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         File dodeploy = createFile("foo.war" + FileSystemDeploymentService.DO_DEPLOY);
         File deployed = new File(tmpDir, "foo.war" + FileSystemDeploymentService.DEPLOYED);
         TesteeSet ts = createTestee();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -1217,7 +1217,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         // Create a new testee to simulate a reboot
         ts = createTestee();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
         assertTrue(war.exists());
         assertFalse(dodeploy.exists());
@@ -1238,7 +1238,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         testSupport.createZip(war, 0, false, false, false, false);
         // trigger deployment
         TesteeSet ts = createTestee();
-        ts.controller.addCompositeFailureResponse(1, 1);
+        ts.controller.addFailureResponse(1, 1);
         // set the auto-deploy of zipped content on the scanner
         ts.testee.setAutoDeployZippedContent(true);
         ts.testee.scan();
@@ -1258,7 +1258,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         long newLastModifiedTime = failed.lastModified() + 1000;
         logger.info("Updating last modified time of war " + war + " from " + war.lastModified() + " to " + newLastModifiedTime + " to simulate changes to the deployment");
         war.setLastModified(newLastModifiedTime);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         // make sure the deployment exists after the scan
@@ -1286,7 +1286,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         testSupport.createZip(war, 0, false, false, false, false);
         // trigger deployment
         TesteeSet ts = createTestee();
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         // set the auto-deploy of zipped content on the scanner
         ts.testee.setAutoDeployZippedContent(true);
         ts.testee.scan();
@@ -1301,7 +1301,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
         // now trigger a undeployment by removed the "deployed" marker file
         assertTrue("Could not delete " + deployed.getAbsolutePath() + " marker file", deployed.delete());
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         // make sure undeployed marker exists
@@ -1315,7 +1315,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         long newLastModifiedTime = undeployed.lastModified() + 1000;
         logger.info("Updating last modified time of war " + war + " from " + war.lastModified() + " to " + newLastModifiedTime + " to simulate changes to the deployment");
         war.setLastModified(newLastModifiedTime);
-        ts.controller.addCompositeSuccessResponse(1);
+        ts.controller.addSuccessResponse(1);
         ts.testee.scan();
 
         // make sure the deployment exists after the scan
@@ -1448,7 +1448,7 @@ public class FileSystemDeploymentServiceUnitTestCase {
         @Override
         public ModelNode execute(ModelNode operation) throws IOException {
             requests.add(operation);
-            return processOp(operation);
+            return processOp(operation, false);
         }
 
         @Override
@@ -1500,47 +1500,36 @@ public class FileSystemDeploymentServiceUnitTestCase {
             }
         }
 
-        public void addCompositeSuccessResponse(int count) {
-            ModelNode rsp = new ModelNode();
-            rsp.get(OUTCOME).set(SUCCESS);
-            ModelNode result = rsp.get(RESULT);
-            for (int i = 1; i <= count; i++) {
-                result.get("step-" + i, OUTCOME).set(SUCCESS);
-                result.get("step-" + i, RESULT);
+        public void addSuccessResponse(int count) {
+            for (int i = 1; i<=count; i++) {
+                final ModelNode rsp = new ModelNode();
+                rsp.get(OUTCOME).set(SUCCESS);
+                final ModelNode result = rsp.get(RESULT);
+                responses.add(new Response(true, rsp));
             }
-
-            responses.add(new Response(true, rsp));
         }
 
-        public void addCompositeFailureResponse(int count, int failureStep) {
+        public void addFailureResponse(int count, int failureOp) {
 
-            if (count < failureStep) {
-                throw new IllegalArgumentException("failureStep must be > count");
+            if (count < failureOp) {
+                throw new IllegalArgumentException("failureOp must not be > count");
             }
-
-            ModelNode rsp = new ModelNode();
-            rsp.get(OUTCOME).set(FAILED);
-            ModelNode result = rsp.get(RESULT);
             for (int i = 1; i <= count; i++) {
-                String step = "step-" + i;
-                if (i < failureStep) {
-                    result.get(step, OUTCOME).set(FAILED);
-                    result.get(step, RESULT);
-                    result.get(step, ROLLED_BACK).set(true);
+                final ModelNode rsp = new ModelNode();
+                if (i > failureOp) {
+                    rsp.get(OUTCOME).set(CANCELLED);
+                } else {
+                    rsp.get(OUTCOME).set(FAILED);
                 }
-                else if (i == failureStep){
-                    result.get(step, OUTCOME).set(FAILED);
-                    result.get(step, FAILURE_DESCRIPTION).set(new ModelNode().set("badness happened"));
-                    result.get(step, ROLLED_BACK).set(true);
-                }
-                else {
-                    result.get(step, OUTCOME).set(CANCELLED);
-                }
-            }
-            rsp.get(FAILURE_DESCRIPTION).set(new ModelNode().set("badness happened"));
-            rsp.get(ROLLED_BACK).set(true);
+                rsp.get(FAILURE_DESCRIPTION).set(new ModelNode().set("badness happened"));
+                rsp.get(ROLLED_BACK).set(true);
 
-            responses.add(new Response(true, rsp));
+                final ModelNode result = rsp.get(RESULT);
+                if (i == failureOp) {
+                    result.get(FAILURE_DESCRIPTION).set("badness happened");
+                }
+                responses.add(new Response(true, rsp));
+            }
         }
 
         private ModelNode getDeploymentNamesResponse() {
@@ -1554,61 +1543,50 @@ public class FileSystemDeploymentServiceUnitTestCase {
             return content;
         }
 
-        private ModelNode processOp(ModelNode op) {
+        private ModelNode processOp(final ModelNode op, final boolean isStep) {
 
-            String opName = op.require(OP).asString();
+            final String opName = op.require(OP).asString();
             if (READ_CHILDREN_NAMES_OPERATION.equals(opName)) {
                 return getDeploymentNamesResponse();
             }
+            final PathAddress address = PathAddress.pathAddress(op.require(OP_ADDR));
+            if (ADD.equals(opName)) {
+                // Since AS7-431 the content is no longer managed
+                //added.put(address.getLastElement().getValue(), child.require(CONTENT).require(0).require(HASH).asBytes());
+                added.put(address.getLastElement().getValue(), randomHash());
+            }
+            else if (REMOVE.equals(opName)) {
+                added.remove(address.getLastElement().getValue());
+            }
+            else if (DEPLOY.equals(opName)) {
+                String name = address.getLastElement().getValue();
+                deployed.put(name, added.get(name));
+            }
+            else if (UNDEPLOY.equals(opName)) {
+                deployed.remove(address.getLastElement().getValue());
+            }
+            else if (FULL_REPLACE_DEPLOYMENT.equals(opName)) {
+                String name = op.require(NAME).asString();
+                // Since AS7-431 the content is no longer managed
+                //byte[] hash = child.require(CONTENT).require(0).require(HASH).asBytes();
+                final byte[] hash = randomHash();
+                added.put(name, hash);
+                deployed.put(name, hash);
+            }
             else if (COMPOSITE.equals(opName)) {
-                for (ModelNode child : op.require(STEPS).asList()) {
-                    opName = child.require(OP).asString();
-                    if (COMPOSITE.equals(opName)) {
-                        return processOp(child);
-                    }
-
-                    if (responses.isEmpty()) {
-                        Assert.fail("unexpected request " + op);
-                        return null; // unreachable
-                    }
-
-                    if (!responses.get(0).ok) {
-                        // don't change state for a failed response
-                        continue;
-                    }
-
-                    PathAddress address = PathAddress.pathAddress(child.require(OP_ADDR));
-                    if (ADD.equals(opName)) {
-                        // Since AS7-431 the content is no longer managed
-                        //added.put(address.getLastElement().getValue(), child.require(CONTENT).require(0).require(HASH).asBytes());
-                        added.put(address.getLastElement().getValue(), randomHash());
-                    }
-                    else if (REMOVE.equals(opName)) {
-                        added.remove(address.getLastElement().getValue());
-                    }
-                    else if (DEPLOY.equals(opName)) {
-                        String name = address.getLastElement().getValue();
-                        deployed.put(name, added.get(name));
-                    }
-                    else if (UNDEPLOY.equals(opName)) {
-                        deployed.remove(address.getLastElement().getValue());
-                    }
-                    else if (FULL_REPLACE_DEPLOYMENT.equals(opName)) {
-                        String name = child.require(NAME).asString();
-                        // Since AS7-431 the content is no longer managed
-                        //byte[] hash = child.require(CONTENT).require(0).require(HASH).asBytes();
-                        final byte[] hash = randomHash();
-                        added.put(name, hash);
-                        deployed.put(name, hash);
-                    }
-                    else {
-                        throw new IllegalArgumentException("unexpected step " + opName);
-                    }
+                for (final ModelNode step : op.require(STEPS).asList()) {
+                    this.processOp(step, true);
                 }
-                return responses.remove(0).rsp;
             }
             else {
                 throw new IllegalArgumentException("unexpected operation " + opName);
+            }
+            // if it's a step, we don't return anything since the operation is still not complete
+            if (isStep) {
+                return null;
+            } else {
+                // return the operation result
+                return responses.remove(0).rsp;
             }
         }
 

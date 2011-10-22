@@ -46,6 +46,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -390,69 +391,7 @@ class FileSystemDeploymentService implements DeploymentScanner {
                 }
 
                 // Process the tasks
-                if (scannerTasks.size() > 0) {
-                    List<ModelNode> updates = new ArrayList<ModelNode>(scannerTasks.size());
-
-                    for (ScannerTask task : scannerTasks) {
-                        task.recordInProgress(); // puts down .isdeploying, .isundeploying
-                        final ModelNode update = task.getUpdate();
-                        if (log.isDebugEnabled()) {
-                            log.debugf("Deployment scan of [%s] found update action [%s]", deploymentDir, update);
-                        }
-                        updates.add(update);
-                    }
-
-                    while (!updates.isEmpty()) {
-                        ModelNode composite = getCompositeUpdate(updates);
-
-                        final DeploymentTask deploymentTask = new DeploymentTask(new OperationBuilder(composite).build());
-                        final Future<ModelNode> futureResults = scheduledExecutor.submit(deploymentTask);
-                        final ModelNode results;
-                        try {
-                            results = futureResults.get(deploymentTimeout, TimeUnit.SECONDS);
-                        } catch (TimeoutException e) {
-                            futureResults.cancel(true);
-                            final ModelNode failure = new ModelNode();
-                            failure.get(OUTCOME).set(FAILED);
-                            failure.get(FAILURE_DESCRIPTION).set("Did not receive a response to the deployment operation within " +
-                                    "the allowed timeout period [" + deploymentTimeout + " seconds]. Check the server configuration" +
-                                    "file and the server logs to find more about the status of the deployment.");
-                            for (ScannerTask task : scannerTasks) {
-                                task.handleFailureResult(failure);
-                            }
-                            break;
-                        } catch (Exception e) {
-                            log.error("File system deployment service failed", e);
-                            futureResults.cancel(true);
-                            final ModelNode failure = new ModelNode();
-                            failure.get(OUTCOME).set(FAILED);
-                            failure.get(FAILURE_DESCRIPTION).set(e.getMessage());
-                            for (ScannerTask task : scannerTasks) {
-                                task.handleFailureResult(failure);
-                            }
-                            break;
-                        }
-
-                        final List<Property> resultList = results.get(RESULT).asPropertyList();
-                        final List<ModelNode> toRetry = new ArrayList<ModelNode>();
-                        final List<ScannerTask> retryTasks = new ArrayList<ScannerTask>();
-                        for (int i = 0; i < resultList.size(); i++) {
-                            final ModelNode result = resultList.get(i).getValue();
-                            final ScannerTask task = scannerTasks.get(i);
-                            final ModelNode outcome = result.get(OUTCOME);
-                            if (outcome.isDefined() && SUCCESS.equals(outcome.asString())) {
-                                task.handleSuccessResult();
-                            } else if (outcome.isDefined() && CANCELLED.equals(outcome.asString())) {
-                                toRetry.add(updates.get(i));
-                                retryTasks.add(task);
-                            } else {
-                                task.handleFailureResult(result);
-                            }
-                        }
-                        updates = toRetry;
-                        scannerTasks = retryTasks;
-                    }
-                }
+                this.submitDeploymentUpdates(scannerTasks);
                 log.tracef("Scan complete");
             }
         } finally {
@@ -466,6 +405,80 @@ class FileSystemDeploymentService implements DeploymentScanner {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Submits the deployment updates of each of the passed {@link ScannerTask}s as management operations.
+     * The deployment update of each {@link ScannerTask} is submitted as a separate operation so that the result
+     * of one deployment doesn't affect the other.
+     * <p/>
+     * This method also checks the result of the deployment management operation and if necessary resubmits the
+     * {@link ScannerTask} to retry the deployment update
+     *
+     * @param scannerTasks The deployment scanner tasks
+     */
+    private void submitDeploymentUpdates(final List<ScannerTask> scannerTasks) {
+
+        if (scannerTasks == null || scannerTasks.isEmpty()) {
+            return;
+        }
+        // a list which will maintain the scanner tasks that might have to be retried (depending
+        // on the result that's received after submitting them)
+        final List<ScannerTask> tasksToRetry = new ArrayList<ScannerTask>();
+        for (final ScannerTask scannerTask : scannerTasks) {
+            scannerTask.recordInProgress(); // puts down .isdeploying, .isundeploying
+            // get the corresponding deployment update (which can be re-deploy, deploy, undeploy etc...)
+            // for this task
+            final ModelNode deploymentUpdate = scannerTask.getUpdate();
+            if (log.isDebugEnabled()) {
+                log.debugf("Deployment scan of [%s] found update action [%s]", deploymentDir, deploymentUpdate);
+            }
+            // create a deployment task for the deployment update (which represents one single deployment)
+            final DeploymentTask deploymentTask = new DeploymentTask(new OperationBuilder(deploymentUpdate).build());
+            final Future<ModelNode> futureResult = scheduledExecutor.submit(deploymentTask);
+            final ModelNode result;
+            try {
+                // wait for the result
+                result = futureResult.get(deploymentTimeout, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                futureResult.cancel(true);
+                final ModelNode failure = new ModelNode();
+                failure.get(OUTCOME).set(FAILED);
+                failure.get(FAILURE_DESCRIPTION).set("Did not receive a response to the deployment operation for " + scannerTask.deploymentName
+                        +  " within the allowed timeout period [" + deploymentTimeout + " seconds]. Check the server configuration" +
+                        "file and the server logs to find more about the status of the deployment.");
+                // let the scanner task handle the failure
+                scannerTask.handleFailureResult(failure);
+                break;
+            } catch (Exception e) {
+                log.error("File system deployment service failed", e);
+                futureResult.cancel(true);
+                final ModelNode failure = new ModelNode();
+                failure.get(OUTCOME).set(FAILED);
+                failure.get(FAILURE_DESCRIPTION).set(e.getMessage());
+                // let the scanner task handle the failure
+                scannerTask.handleFailureResult(failure);
+                break;
+            }
+
+            final ModelNode outcome = result.get(OUTCOME);
+            if (outcome.isDefined() && SUCCESS.equals(outcome.asString())) {
+                // let the scanner task handle the successful result
+                scannerTask.handleSuccessResult();
+            } else if (outcome.isDefined() && CANCELLED.equals(outcome.asString())) {
+                log.debug("Deployment update: " + deploymentUpdate + " will be added to retry list since it was marked as CANCELLED");
+                // add it to retry tasks list
+                tasksToRetry.add(scannerTask);
+            } else {
+                // let the scanner task handle the failure
+                scannerTask.handleFailureResult(result);
+            }
+        }
+
+        // retry any tasks that need to be retried
+        if (!tasksToRetry.isEmpty()) {
+            this.submitDeploymentUpdates(tasksToRetry);
         }
     }
 
@@ -817,15 +830,6 @@ class FileSystemDeploymentService implements DeploymentScanner {
             }
         }
         return deploymentNames;
-    }
-
-    private ModelNode getCompositeUpdate(final List<ModelNode> updates) {
-        final ModelNode op = Util.getEmptyOperation(COMPOSITE, new ModelNode());
-        final ModelNode steps = op.get(STEPS);
-        for (ModelNode update : updates) {
-            steps.add(update);
-        }
-        return op;
     }
 
     private ModelNode getCompositeUpdate(final ModelNode... updates) {
