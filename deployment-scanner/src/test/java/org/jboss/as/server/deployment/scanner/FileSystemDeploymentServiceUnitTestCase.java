@@ -1329,6 +1329,51 @@ public class FileSystemDeploymentServiceUnitTestCase {
 
     }
 
+    /**
+     * Test that when multiple deployments are present on the filesystem, they are deployed
+     * using separate individual management operations instead of a single composite operation,
+     * to avoid the failures of one deployment affecting the rest of the deployments.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMultipleDeploymentsDontAffectEachOther() throws Exception {
+        // war 1
+        File war1 = createFile("one.war");
+        File dodeploy1 = createFile("one.war" + FileSystemDeploymentService.DO_DEPLOY);
+        File deployed1 = new File(tmpDir, "one.war" + FileSystemDeploymentService.DEPLOYED);
+        File failed1 = new File(tmpDir, "one.war" + FileSystemDeploymentService.FAILED_DEPLOY);
+
+        // war 2
+        File war2 = createFile("two.war");
+        File dodeploy2 = createFile("two.war" + FileSystemDeploymentService.DO_DEPLOY);
+        File deployed2 = new File(tmpDir, "two.war" + FileSystemDeploymentService.DEPLOYED);
+        File failed2 = new File(tmpDir, "two.war" + FileSystemDeploymentService.FAILED_DEPLOY);
+
+        TesteeSet ts = createTestee();
+        // create 2 responses, with the first response indicating a failure (for war 1)
+        ts.controller.addFailureResponse(2, 1);
+        ts.testee.scan();
+
+        // test war 1 exists
+        assertTrue(war1.exists());
+        // war1.dodeploy shouldn't be present
+        assertFalse(dodeploy1.exists());
+        // .deployed shouldn't be present for war1
+        assertFalse(deployed1.exists());
+        // .failed should exist for war1
+        assertTrue(failed1.exists());
+
+        // test war 2 exists
+        assertTrue(war2.exists());
+        // war2.dodeploy shouldn't be present
+        assertFalse(dodeploy2.exists());
+        // war2.deployed should exist
+        assertTrue(deployed2.exists());
+        // war2.failed shouldn't exist
+        assertFalse(failed2.exists());
+    }
+
     private TesteeSet createTestee(String... existingContent) throws OperationFailedException {
         return createTestee(new MockServerController(new MockDeploymentRepository(), existingContent));
     }
@@ -1516,13 +1561,18 @@ public class FileSystemDeploymentServiceUnitTestCase {
             }
             for (int i = 1; i <= count; i++) {
                 final ModelNode rsp = new ModelNode();
-                if (i > failureOp) {
-                    rsp.get(OUTCOME).set(CANCELLED);
-                } else {
+//                if (i > failureOp) {
+//                    rsp.get(OUTCOME).set(CANCELLED);
+//                } else {
+//                    rsp.get(OUTCOME).set(FAILED);
+//                }
+                if (i == failureOp) {
                     rsp.get(OUTCOME).set(FAILED);
+                    rsp.get(FAILURE_DESCRIPTION).set(new ModelNode().set("badness happened"));
+                    rsp.get(ROLLED_BACK).set(true);
+                } else {
+                    rsp.get(OUTCOME).set(SUCCESS);
                 }
-                rsp.get(FAILURE_DESCRIPTION).set(new ModelNode().set("badness happened"));
-                rsp.get(ROLLED_BACK).set(true);
 
                 final ModelNode result = rsp.get(RESULT);
                 if (i == failureOp) {

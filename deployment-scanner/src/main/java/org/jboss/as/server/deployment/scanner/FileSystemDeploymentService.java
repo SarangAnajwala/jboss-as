@@ -467,6 +467,13 @@ class FileSystemDeploymentService implements DeploymentScanner {
                 // let the scanner task handle the successful result
                 scannerTask.handleSuccessResult();
             } else if (outcome.isDefined() && CANCELLED.equals(outcome.asString())) {
+                // TODO: This needs a rethink. Previously, multiple deployments were deployed
+                // as a single composite operation. So each "step" corresponded to a different
+                // deployment unit. Effectively, if a "step" was cancelled (due to a failure in previous step)
+                // this retry task would ensure that the cancelled deployment was triggered as a retry task.
+                // Now that we have separate individual opeartions for each deployment unit, this cancel logic
+                // is no longer valid. For now, let's keep this retry task and see if it affects anything. If not,
+                // just get rid of this soon.
                 log.debug("Deployment update: " + deploymentUpdate + " will be added to retry list since it was marked as CANCELLED");
                 // add it to retry tasks list
                 tasksToRetry.add(scannerTask);
