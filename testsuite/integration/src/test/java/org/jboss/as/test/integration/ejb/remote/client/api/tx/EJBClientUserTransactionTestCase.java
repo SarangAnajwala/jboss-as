@@ -103,7 +103,7 @@ public class EJBClientUserTransactionTestCase {
      */
     @BeforeClass
     public static void beforeTestClass() throws Exception {
-        final Endpoint endpoint = Remoting.createEndpoint("endpoint", OptionMap.EMPTY);
+        final Endpoint endpoint = Remoting.createEndpoint("ejb-remote-endpoint", OptionMap.EMPTY);
         endpoint.addConnectionProvider("remote", new RemoteConnectionProviderFactory(), OptionMap.create(Options.SSL_ENABLED, Boolean.FALSE));
 
         // open a connection
@@ -146,7 +146,7 @@ public class EJBClientUserTransactionTestCase {
         final CMTRemote cmtRemoteBean = EJBClient.createProxy(cmtRemoteBeanLocator);
 
         final EJBClientTransactionContext ejbClientTransactionContext = EJBClientTransactionContext.createLocal();
-        final UserTransaction userTransaction = EJBClient.getUserTransaction("dummynodename");
+        final UserTransaction userTransaction = EJBClient.getUserTransaction("ejb-remote-endpoint");
         userTransaction.begin();
         cmtRemoteBean.mandatoryTxOp();
         userTransaction.commit();
@@ -166,7 +166,7 @@ public class EJBClientUserTransactionTestCase {
         final BatchRetriever batchRetriever = EJBClient.createProxy(batchRetrieverLocator);
 
         final EJBClientTransactionContext ejbClientTransactionContext = EJBClientTransactionContext.createLocal();
-        final UserTransaction userTransaction = EJBClient.getUserTransaction("dummynodename");
+        final UserTransaction userTransaction = EJBClient.getUserTransaction("ejb-remote-endpoint");
         final String batchName = "Simple Batch";
         // create a batch
         userTransaction.begin();

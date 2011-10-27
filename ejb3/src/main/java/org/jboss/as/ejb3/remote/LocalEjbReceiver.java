@@ -214,6 +214,12 @@ public class LocalEjbReceiver extends EJBReceiver<Void> implements Service<Local
         return null;
     }
 
+    // TODO: We'll have to figure out what a nodename means in terms of a LocalReceiver
+    @Override
+    protected String getNodeName() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     @Override
     public void start(final StartContext context) throws StartException {
         final ObjectClonerFactory factory = ObjectCloners.getSerializingObjectClonerFactory();
