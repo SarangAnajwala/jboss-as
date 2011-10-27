@@ -29,7 +29,7 @@ import org.jboss.as.ejb3.component.interceptors.CancellationFlag;
 import org.jboss.as.ejb3.component.session.SessionBeanComponent;
 import org.jboss.as.ejb3.deployment.DeploymentRepository;
 import org.jboss.as.ejb3.deployment.EjbDeploymentInformation;
-import org.jboss.ejb.client.Locator;
+import org.jboss.ejb.client.EJBLocator;
 import org.jboss.ejb.client.SessionID;
 import org.jboss.ejb.client.StatefulEJBLocator;
 import org.jboss.ejb.client.remoting.RemotingAttachments;
@@ -114,13 +114,13 @@ class MethodInvocationMessageHandler extends EJBIdentifierBasedMessageHandler {
         // correct CL for the rest of the unmarshalling of the stream
         classLoaderProvider.switchClassLoader(ejbDeploymentInformation.getDeploymentClassLoader());
         // read the Locator
-        final Locator locator;
+        final EJBLocator ejbLocator;
         try {
-            locator = (Locator) unMarshaller.readObject();
+            ejbLocator = (EJBLocator) unMarshaller.readObject();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        final String viewClassName = locator.getInterfaceType().getName();
+        final String viewClassName = ejbLocator.getViewType().getName();
         if (!ejbDeploymentInformation.getViewNames().contains(viewClassName)) {
             this.writeNoSuchEJBFailureMessage(channel, invocationId, appName, moduleName, distinctName, beanName, viewClassName);
             return;
@@ -166,7 +166,7 @@ class MethodInvocationMessageHandler extends EJBIdentifierBasedMessageHandler {
                 // invoke the method
                 Object result = null;
                 try {
-                    result = invokeMethod(componentView, invokedMethod, methodParams, locator, attachments);
+                    result = invokeMethod(componentView, invokedMethod, methodParams, ejbLocator, attachments);
                 } catch (Throwable throwable) {
                     try {
                         // write out the failure
@@ -200,7 +200,7 @@ class MethodInvocationMessageHandler extends EJBIdentifierBasedMessageHandler {
 
     }
 
-    private Object invokeMethod(final ComponentView componentView, final Method method, final Object[] args, final Locator ejbLocator, final RemotingAttachments attachments) throws Throwable {
+    private Object invokeMethod(final ComponentView componentView, final Method method, final Object[] args, final EJBLocator ejbLocator, final RemotingAttachments attachments) throws Throwable {
         final InterceptorContext interceptorContext = new InterceptorContext();
         interceptorContext.setParameters(args);
         interceptorContext.setMethod(method);

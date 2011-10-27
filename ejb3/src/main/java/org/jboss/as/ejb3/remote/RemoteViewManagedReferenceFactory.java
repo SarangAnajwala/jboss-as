@@ -25,7 +25,7 @@ import org.jboss.as.naming.ManagedReference;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.ValueManagedReference;
 import org.jboss.ejb.client.EJBClient;
-import org.jboss.ejb.client.Locator;
+import org.jboss.ejb.client.EJBLocator;
 import org.jboss.ejb.client.SessionID;
 import org.jboss.ejb.client.StatefulEJBLocator;
 import org.jboss.ejb.client.StatelessEJBLocator;
@@ -63,7 +63,7 @@ public class RemoteViewManagedReferenceFactory implements ManagedReferenceFactor
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Could not load view class for ejb " + beanName, e);
         }
-        Locator ejbLocator = null;
+        EJBLocator ejbLocator = null;
         if (stateful) {
             final SessionID sessionID;
             try {
