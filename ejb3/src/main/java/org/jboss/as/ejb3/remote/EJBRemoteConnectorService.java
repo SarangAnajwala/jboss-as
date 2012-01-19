@@ -29,6 +29,8 @@ import org.jboss.as.network.ClientMapping;
 import org.jboss.as.remoting.AbstractStreamServerService;
 import org.jboss.as.remoting.InjectedSocketBindingStreamServerService;
 import org.jboss.as.server.ServerEnvironment;
+import org.jboss.ejb.client.ConstantContextSelector;
+import org.jboss.ejb.client.EJBClientTransactionContext;
 import org.jboss.ejb.client.remoting.PackedInteger;
 import org.jboss.logging.Logger;
 import org.jboss.marshalling.MarshallerFactory;
@@ -52,6 +54,8 @@ import org.jboss.remoting3.ServiceRegistrationException;
 import org.xnio.IoUtils;
 import org.xnio.OptionMap;
 
+import javax.transaction.TransactionManager;
+import javax.transaction.TransactionSynchronizationRegistry;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -76,6 +80,8 @@ public class EJBRemoteConnectorService implements Service<EJBRemoteConnectorServ
     private final InjectedValue<EJBRemoteTransactionsRepository> ejbRemoteTransactionsRepositoryInjectedValue = new InjectedValue<EJBRemoteTransactionsRepository>();
     private final InjectedValue<RegistryCollector> clusterRegistryCollector = new InjectedValue<RegistryCollector>();
     private final InjectedValue<ServerEnvironment> serverEnvironment = new InjectedValue<ServerEnvironment>();
+    private final InjectedValue<TransactionManager> txManager = new InjectedValue<TransactionManager>();
+    private final InjectedValue<TransactionSynchronizationRegistry> txSyncRegistry = new InjectedValue<TransactionSynchronizationRegistry>();
     private final ServiceName remotingConnectorServiceName;
     private volatile Registration registration;
     private volatile InjectedSocketBindingStreamServerService remotingServer;
@@ -106,12 +112,16 @@ public class EJBRemoteConnectorService implements Service<EJBRemoteConnectorServ
         } catch (ServiceRegistrationException e) {
             throw new StartException(e);
         }
+
+        final EJBClientTransactionContext ejbClientTransactionContext = EJBClientTransactionContext.create(this.txManager.getValue(), this.txSyncRegistry.getValue());
+        EJBClientTransactionContext.setSelector(new ConstantContextSelector<EJBClientTransactionContext>(ejbClientTransactionContext));
     }
 
     @Override
     public void stop(StopContext context) {
         this.remotingServer = null;
         registration.close();
+        EJBClientTransactionContext.setSelector(new ConstantContextSelector<EJBClientTransactionContext>(null));
     }
 
     @Override
@@ -121,6 +131,14 @@ public class EJBRemoteConnectorService implements Service<EJBRemoteConnectorServ
 
     public InjectedValue<Endpoint> getEndpointInjector() {
         return endpointValue;
+    }
+
+    public Injector<TransactionManager> getTransactionManagerInjector() {
+        return this.txManager;
+    }
+
+    public Injector<TransactionSynchronizationRegistry> getTxSyncRegistryInjector() {
+        return this.txSyncRegistry;
     }
 
     private void sendVersionMessage(final Channel channel) throws IOException {
