@@ -373,6 +373,34 @@ public class EJBClientAPIUsageTestCase {
         }
     }
 
+    /**
+     * Tests that multiple invocations on stateful session beans, on the same EJB channel, don't result in
+     * exceptions
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSFSBInvocationMultipleTimes() throws Exception {
+        final int NUM_THREADS = 10;
+        final CountDownLatch startLatch = new CountDownLatch(NUM_THREADS);
+        final int numInvocations = 2;
+        for (int j = 0; j < 80; j++) {
+            final ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+            final Future futureResults[] = new Future[NUM_THREADS];
+            try {
+                for (int i = 0; i < NUM_THREADS; i++) {
+                    futureResults[i] = executor.submit(new SFSBInvoker(startLatch, numInvocations));
+                }
+            } finally {
+                executor.shutdown();
+            }
+            // get the result
+            for (int i = 0; i < NUM_THREADS; i++) {
+                futureResults[i].get();
+            }
+        }
+    }
+
     private class SFSBInvoker implements Callable<Void> {
 
         private final CountDownLatch startLatch;
