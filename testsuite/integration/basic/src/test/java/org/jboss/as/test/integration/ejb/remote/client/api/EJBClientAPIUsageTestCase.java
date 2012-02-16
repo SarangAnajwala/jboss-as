@@ -44,6 +44,10 @@ import org.junit.runner.RunWith;
 
 import javax.ejb.EJBException;
 import javax.ejb.NoSuchEJBException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
@@ -341,5 +345,64 @@ public class EJBClientAPIUsageTestCase {
         final StatelessEJBLocator<EchoRemote> locator = new StatelessEJBLocator(EchoRemote.class, APP_NAME, MODULE_NAME, EchoBean.class.getSimpleName(), "");
         final EchoRemote proxy = EJBClient.createProxy(locator);
         Assert.assertTrue(proxy.testRequestScopeActive());
+    }
+
+    /**
+     * Tests that multiple invocations on stateful session beans, on the same EJB channel, don't result in
+     * exceptions
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSFSBMaxSimultaneousInvocation() throws Exception {
+        final int NUM_THREADS = 400;
+        final CountDownLatch startLatch = new CountDownLatch(NUM_THREADS);
+        final int numInvocations = 50;
+        final ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+        final Future futureResults[] = new Future[NUM_THREADS];
+        try {
+            for (int i = 0; i < NUM_THREADS; i++) {
+                futureResults[i] = executor.submit(new SFSBInvoker(startLatch, numInvocations));
+            }
+        } finally {
+            executor.shutdown();
+        }
+        // get the result
+        for (int i = 0; i < NUM_THREADS; i++) {
+            futureResults[i].get();
+        }
+    }
+
+    private class SFSBInvoker implements Callable<Void> {
+
+        private final CountDownLatch startLatch;
+        private final int numInvocations;
+
+        SFSBInvoker(final CountDownLatch startLatch, final int numInvocations) {
+            this.startLatch = startLatch;
+            this.numInvocations = numInvocations;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            // let other know we have started
+            this.startLatch.countDown();
+            // wait for others
+            this.startLatch.await();
+            // now lookup and invoke
+            final StatefulEJBLocator<Counter> locator = EJBClient.createSession(Counter.class, APP_NAME, MODULE_NAME, CounterBean.class.getSimpleName(), "");
+            final Counter counter = EJBClient.createProxy(locator);
+            Assert.assertNotNull("Received a null proxy", counter);
+            // invoke the bean
+            final int initialCount = counter.getCount();
+            logger.info("Thread " + Thread.currentThread() + " got initial count " + initialCount);
+            Assert.assertEquals("Unexpected initial count from stateful bean", 0, initialCount);
+            for (int i = 1; i <= numInvocations; i++) {
+                final int count = counter.incrementAndGetCount();
+                logger.info("Thread " + Thread.currentThread() + " got next count " + count);
+                Assert.assertEquals("Unexpected count after increment", i, count);
+            }
+            return null;
+        }
     }
 }
