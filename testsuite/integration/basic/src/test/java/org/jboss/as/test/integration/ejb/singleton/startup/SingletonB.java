@@ -23,6 +23,8 @@
 package org.jboss.as.test.integration.ejb.singleton.startup;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.DependsOn;
 import javax.ejb.EJB;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
@@ -34,6 +36,7 @@ import org.jboss.logging.Logger;
  */
 @Singleton
 @Remote(SingletonBeanRemoteView.class)
+@DependsOn("SLSBTwo")
 public class SingletonB implements SingletonBeanRemoteView {
 
     private static Logger logger = Logger.getLogger(SingletonB.class);
@@ -54,5 +57,13 @@ public class SingletonB implements SingletonBeanRemoteView {
     public String echo(String msg) {
         logger.info("Echo " + msg);
         return msg;
+    }
+    
+    @PreDestroy
+    public void onDestroy() {
+        logger.info("Trying to use a SLSB in @PreDestroy");
+        this.slsbTwo.doSomething();
+        logger.info("Successful use of SLSB in @PreDestroy");
+
     }
 }
