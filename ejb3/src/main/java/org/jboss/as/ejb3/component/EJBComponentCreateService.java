@@ -116,7 +116,11 @@ public class EJBComponentCreateService extends BasicComponentCreateService {
         if (ejbComponentDescription.isTimerServiceApplicable()) {
             Map<Method, InterceptorFactory> timeoutInterceptors = new IdentityHashMap<Method, InterceptorFactory>();
             for (Method method : componentConfiguration.getDefinedComponentMethods()) {
-                final InterceptorFactory interceptorFactory = Interceptors.getChainedInterceptorFactory(componentConfiguration.getAroundTimeoutInterceptors(method));
+                final List<InterceptorFactory> interceptors = componentConfiguration.getAroundTimeoutInterceptors(method);
+                if (interceptors.isEmpty()) {
+                    continue;
+                }
+                final InterceptorFactory interceptorFactory = Interceptors.getChainedInterceptorFactory(interceptors);
                 timeoutInterceptors.put(method, interceptorFactory);
             }
 
