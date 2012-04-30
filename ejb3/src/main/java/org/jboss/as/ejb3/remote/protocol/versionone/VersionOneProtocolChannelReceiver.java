@@ -74,7 +74,7 @@ public class VersionOneProtocolChannelReceiver implements Channel.Receiver, Depl
     private final MarshallerFactory marshallerFactory;
     private final ExecutorService executorService;
     private final RegistryCollector<String, List<ClientMapping>> clientMappingRegistryCollector;
-    private final Set<ClusterTopologyUpdateListener> clusterTopologyUpdateListeners = new HashSet<ClusterTopologyUpdateListener>();
+    private final Set<ClusterTopologyUpdateListener> clusterTopologyUpdateListeners = Collections.synchronizedSet(new HashSet<ClusterTopologyUpdateListener>());
 
     public VersionOneProtocolChannelReceiver(final ChannelAssociation channelAssociation, final DeploymentRepository deploymentRepository,
                                              final EJBRemoteTransactionsRepository transactionsRepository, final RegistryCollector<String, List<ClientMapping>> clientMappingRegistryCollector,
@@ -258,13 +258,19 @@ public class VersionOneProtocolChannelReceiver implements Channel.Receiver, Depl
     }
 
     @Override
-    public void registryAdded(Registry<String, List<ClientMapping>> registry) {
+    public void registryAdded(Registry<String, List<ClientMapping>> cluster) {
         try {
-            logger.debug("Received new cluster formation notification for cluster " + registry.getName());
-            this.sendNewClusterFormedMessage(Collections.singleton(registry));
+            logger.debug("Received new cluster formation notification for cluster " + cluster.getName());
+            this.sendNewClusterFormedMessage(Collections.singleton(cluster));
         } catch (IOException ioe) {
-            logger.warn("Could not send a cluster formation message for cluster: " + registry.getName()
+            logger.warn("Could not send a cluster formation message for cluster: " + cluster.getName()
                     + " to the client on channel " + this.channelAssociation.getChannel(), ioe);
+        } finally {
+            // add a listener for receiving node(s) addition/removal from the cluster
+            final ClusterTopologyUpdateListener clusterTopologyUpdateListener = new ClusterTopologyUpdateListener(cluster, this);
+            cluster.addListener(clusterTopologyUpdateListener);
+            // keep track of this update listener so that we cleanup properly
+            this.clusterTopologyUpdateListeners.add(clusterTopologyUpdateListener);
         }
     }
 

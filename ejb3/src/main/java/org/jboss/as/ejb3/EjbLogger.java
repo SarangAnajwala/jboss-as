@@ -45,6 +45,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.File;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.util.Date;
 
 import static org.jboss.logging.Logger.Level.*;
@@ -455,6 +456,10 @@ public interface EjbLogger extends BasicLogger {
     @LogMessage(level = WARN)
     @Message(id = 14150, value = "Failed to parse property %s due to %s")
     void failedToCreateOptionForProperty(String propertyName, String reason);
+
+    @LogMessage(level = INFO)
+    @Message(id = 14151, value = "Cannot add cluster node %s to cluster %s since none of the client mappings matched for address %s")
+    void cannotAddClusterNodeDueToUnresolvableClientMapping(final String nodeName, final String clusterName, final InetAddress bindAddress);
 
     // Don't add message ids greater that 14299!!! If you need more first check what EjbMessages is
     // using and take more (lower) numbers from the available range for this module. If the range for the module is
