@@ -27,6 +27,8 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporter;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporterImple;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.XATerminatorImple;
 import org.jboss.ejb.client.UserTransactionID;
 import org.jboss.ejb.client.XidTransactionID;
 import org.jboss.msc.inject.Injector;
@@ -37,6 +39,7 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
+import javax.resource.spi.XATerminator;
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
@@ -44,9 +47,12 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Jaikiran Pai
@@ -148,6 +154,30 @@ public class EJBRemoteTransactionsRepository implements Service<EJBRemoteTransac
     Transaction importTransaction(final XidTransactionID xidTransactionID, final int txTimeout) throws XAException {
         final TransactionImporter transactionImporter = SubordinationManager.getTransactionImporter();
         return transactionImporter.importTransaction(xidTransactionID.getXid(), txTimeout);
+    }
+
+    public Xid[] getXidsToRecoverForParentNode(final String parentNodeName, int recoveryFlags) throws XAException {
+        final Set<Xid> xidsToRecover = new HashSet<Xid>();
+        final TransactionImporter transactionImporter = SubordinationManager.getTransactionImporter();
+        if (transactionImporter instanceof TransactionImporterImple) {
+            final Set<Xid> inFlightXids = ((TransactionImporterImple) transactionImporter).getInflightXids(parentNodeName);
+            if (inFlightXids != null) {
+                xidsToRecover.addAll(inFlightXids);
+            }
+        }
+        final XATerminator xaTerminator = SubordinationManager.getXATerminator();
+        if (xaTerminator instanceof XATerminatorImple) {
+            final Xid[] inDoubtTransactions = ((XATerminatorImple) xaTerminator).doRecover(null, parentNodeName);
+            if (inDoubtTransactions != null) {
+                xidsToRecover.addAll(Arrays.asList(inDoubtTransactions));
+            }
+        } else {
+            final Xid[] inDoubtTransactions = xaTerminator.recover(recoveryFlags);
+            if (inDoubtTransactions != null) {
+                xidsToRecover.addAll(Arrays.asList(inDoubtTransactions));
+            }
+        }
+        return xidsToRecover.toArray(new Xid[0]);
     }
 
     public UserTransaction getUserTransaction() {

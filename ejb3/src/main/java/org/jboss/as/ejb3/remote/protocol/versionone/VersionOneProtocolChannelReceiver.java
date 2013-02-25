@@ -64,6 +64,7 @@ public class VersionOneProtocolChannelReceiver implements Channel.Receiver, Depl
     private static final byte HEADER_TX_PREPARE_REQUEST = 0x11;
     private static final byte HEADER_TX_FORGET_REQUEST = 0x12;
     private static final byte HEADER_TX_BEFORE_COMPLETION_REQUEST = 0x13;
+    private static final byte HEADER_TX_RECOVER_MESSAGE = 0x19;
 
     private final ChannelAssociation channelAssociation;
     private final DeploymentRepository deploymentRepository;
@@ -171,6 +172,9 @@ public class VersionOneProtocolChannelReceiver implements Channel.Receiver, Depl
                     break;
                 case HEADER_TX_BEFORE_COMPLETION_REQUEST:
                     messageHandler = new TransactionRequestHandler(this.transactionsRepository, this.marshallerFactory, this.executorService, TransactionRequestHandler.TransactionRequestType.BEFORE_COMPLETION);
+                    break;
+                case HEADER_TX_RECOVER_MESSAGE:
+                    messageHandler = new TransactionRecoverMessageHandler(this.transactionsRepository, this.marshallerFactory, this.executorService);
                     break;
                 default:
                     EjbLogger.ROOT_LOGGER.unsupportedMessageHeader(Integer.toHexString(header), channel);
