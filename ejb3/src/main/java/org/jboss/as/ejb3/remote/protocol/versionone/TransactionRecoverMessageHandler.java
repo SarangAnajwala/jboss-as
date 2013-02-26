@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 /**
+ * Responsible for handling a transaction "recover" message from a EJB remote client
  * @author Jaikiran Pai
  */
 class TransactionRecoverMessageHandler extends AbstractMessageHandler {
@@ -62,7 +63,6 @@ class TransactionRecoverMessageHandler extends AbstractMessageHandler {
 
     @Override
     public void processMessage(ChannelAssociation channelAssociation, MessageInputStream messageInputStream) throws IOException {
-        logger.info("Recived tx recover request");
         final DataInputStream input = new DataInputStream(messageInputStream);
         // read the invocation id
         final short invocationId = input.readShort();
@@ -105,6 +105,7 @@ class TransactionRecoverMessageHandler extends AbstractMessageHandler {
                 return;
             }
             try {
+                // TODO: Change to debug level
                 logger.info("Returning " + xidsToRecover.length + " Xid(s) to recover for parent node: " + txParentNodeName);
                 // write out invocation success message to the channel
                 this.writeResponse(xidsToRecover);
